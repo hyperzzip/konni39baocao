@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Genkifami Content Strategy</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0f172a;color:#e2e8f0;font-family:system-ui,-apple-system,sans-serif;min-height:100vh}
+.header{padding:14px 20px 0;border-bottom:1px solid #1e293b}
+.header-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:6px}
+h1{font-size:20px;font-weight:800;color:#f8fafc}
+h1 span{color:#f59e0b}
+.header-sub{font-size:10px;color:#64748b;margin-top:2px}
+.personas{display:flex;gap:8px}
+.persona-dot{display:flex;align-items:center;gap:3px;font-size:9px}
+.dot{width:6px;height:6px;border-radius:50%}
+.tabs{display:flex;gap:1px}
+.tab-btn{background:transparent;color:#64748b;border:none;border-radius:6px 6px 0 0;padding:8px 16px;font-size:12px;cursor:pointer;border-bottom:2px solid transparent;font-weight:400}
+.tab-btn.active{background:#1e293b;color:#f8fafc;border-bottom:2px solid #f59e0b;font-weight:700}
+.content{padding:20px;max-width:1100px;margin:0 auto}
+.badge{display:inline-block;padding:2px 7px;border-radius:10px;font-size:10px;font-weight:600;margin-right:3px}
+.card{background:#1e293b;border-radius:10px;padding:14px;margin-bottom:10px}
+.card-sm{background:#1e293b;border-radius:8px;padding:10px 14px;margin-bottom:6px;cursor:pointer}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.grid-auto{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:10px}
+.lbl{font-size:9px;color:#64748b;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:3px}
+.txt-sm{font-size:11px;color:#cbd5e1;line-height:1.5}
+.txt-xs{font-size:10px;color:#94a3b8}
+.txt-em{font-size:13px;font-weight:700;color:#e2e8f0}
+.amber{color:#f59e0b}.blue{color:#3b82f6}.green{color:#10b981}.red{color:#ef4444}.purple{color:#8b5cf6}.muted{color:#64748b}
+.num-big{font-size:20px;font-weight:800}
+.flex{display:flex}.items-center{align-items:center}.justify-between{justify-content:space-between}.gap-2{gap:6px}.gap-3{gap:10px}.wrap{flex-wrap:wrap}
+.dark-box{background:#0f172a;border-radius:6px;padding:8px}
+.filter-bar{position:sticky;top:0;z-index:10;background:#0f172a;padding-bottom:8px;padding-top:4px}
+.filter-btn{background:#1e293b;color:#94a3b8;border:1px solid #334155;border-radius:6px;padding:3px 8px;font-size:10px;cursor:pointer;margin:0 2px 2px 0}
+.filter-btn.active{background:#3b82f6;color:#fff;border-color:#3b82f6}
+.expand-detail{margin-top:10px;padding-top:10px;border-top:1px solid #334155}
+.score-box{background:#0f172a;border-radius:6px;padding:6px;text-align:center}
+a.notion-link{color:#94a3b8;font-size:10px;text-decoration:none;background:#0f172a;padding:2px 8px;border-radius:6px;border:1px solid #334155;display:inline-block;margin:0 4px 3px 0}
+.progress-bar{background:#0f172a;border-radius:4px;height:8px;overflow:hidden}
+.progress-fill{height:100%;border-radius:4px}
+.bordered-left{border-left:3px solid}
+.chevron{font-size:12px;transition:transform 0.2s;display:inline-block}
+.rotated{transform:rotate(180deg)}
+.info-box{background:#1e293b;border-radius:8px;padding:10px;margin-bottom:12px;font-size:10px;color:#94a3b8}
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="header-top">
+    <div>
+      <h1><span>Genkifami</span> Content Strategy</h1>
+      <div class="header-sub">DB Video Viral Douyin | Phòng ngừa đột quỵ | 3 Kênh × 3 Persona</div>
+    </div>
+    <div class="personas" id="personaBar"></div>
+  </div>
+  <div class="tabs" id="tabBar"></div>
+</div>
+<div class="content" id="content"></div>
+
+<script>
+const CH={A:{i:"🩺",n:"Bac si",c:"#3b82f6"},B:{i:"🔄",n:"Reup",c:"#8b5cf6"},C:{i:"🎨",n:"Do hoa",c:"#10b981"}};
+const PC={P1:"#06b6d4",P2:"#f43f5e",P3a:"#f59e0b"};
+const PN={P1:"Dan VP tre",P2:"Vo lo chong",P3a:"Con lo bo me"};
+const TC={direct:"#f59e0b",indirect:"#3b82f6",trust:"#10b981"};
+const TL={direct:"Trực tiếp",indirect:"Gián tiếp",trust:"Xây trust"};
+const f=n=>n>=1e3?(n/1e3).toFixed(1)+"K":n?String(n):"—";
+const avg=v=>v.sc?((v.sc[0]+v.sc[1]+v.sc[2]+v.sc[3])/4).toFixed(1):null;
+
+const CL=[
+  {id:"A",n:"Canh tinh nguoi tre",i:"⚡",c:"#06b6d4",p:["P1"],t:"indirect",pr:3,ch:["A","B","C"],d:"Ca benh dot quy o nguoi 19-36 tuoi ket hop lifestyle xau"},
+  {id:"B",n:"Phan loai nhom nguy co",i:"🎯",c:"#8b5cf6",p:["P1","P2","P3a"],t:"indirect",pr:3,ch:["A","C"],d:"BS liet ke N nhom nguy co cao, moi nhom kem vi von"},
+  {id:"C",n:"So cuu khan cap",i:"🚑",c:"#ef4444",p:["P2","P3a"],t:"trust",pr:3,ch:["A","B","C"],d:"Checklist xu ly khi nguoi than dot quy"},
+  {id:"D",n:"Co che benh y khoa",i:"🔬",c:"#6366f1",p:["P1"],t:"trust",pr:2,ch:["C"],d:"Giai thich co che xo vua, huyet khoi, LDL"},
+  {id:"E",n:"Thuc pham/San pham",i:"⭐",c:"#f59e0b",p:["P1","P2","P3a"],t:"direct",pr:5,ch:["A","B"],d:"Hoat chat co loi cho mach mau - GAN TPCN GENKIFAMI"},
+  {id:"F",n:"Bai tap / Huyet vi",i:"🏃",c:"#10b981",p:["P2","P3a"],t:"indirect",pr:3,ch:["A","B","C"],d:"Demo bai tap, bam huyet - de Viet hoa nhat"},
+  {id:"G",n:"Lifestyle hook BS",i:"🩺",c:"#3b82f6",p:["P1","P2","P3a"],t:"indirect",pr:3,ch:["A"],d:"BS ke trai nghiem thuc te kham benh"},
+  {id:"H",n:"Hoi han - regret",i:"💔",c:"#ec4899",p:["P2"],t:"indirect",pr:3,ch:["B","A"],d:"POV nguoi dot quy, hoi han vi khong nghe vo"},
+  {id:"I",n:"Phuc hoi / Di chung",i:"🩹",c:"#78716c",p:["P2","P3a"],t:"trust",pr:2,ch:["A"],d:"Ganh nang gia dinh - DUNG TIET CHE"},
+];
+
+const V=[
+  {stt:30,t:"SV 19 tuoi dot quy vi thuc khuya an do chien ran",cl:"A",tp:"T2",l:46475,s:197110,sv:20079,p:["P1"],ch:["A","B"],kol:"Truong Giang Van (41M)",dy:"https://v.douyin.com/xIIiixFJaZw/",nid:"34fc9dd971b280e49d76eeba2d915b75",ss:"SV 19 tuoi Ho Bac liet nua nguoi do nhoi mau nao cap. Phau thuat lay huyet khoi thanh cong trong 1 tieng. Nguyen nhan: thuc khuya, do chien ran giao tan noi.",vr:"Tuong phan 19 tuoi + dot quy. Share 197K > Like 46K = viral spread cuc manh. Phu huynh cung chia se cho con cai.",sc:[5,1,2,5],d:1},
+  {stt:36,t:"5 dieu tuyet doi khong duoc lam khi nguoi than dot quy",cl:"C",tp:"T3",l:157204,s:68430,sv:108968,p:["P2","P3a"],ch:["A"],kol:"BS Bac The Ninh (5.99M)",dy:"https://v.douyin.com/xovwveoNrq8/",nid:"34fc9dd971b28007a8a6edc6a5ae7da5",ss:"5 tuyet doi: dung tri hoan, dung lac, dung cho an, dung tu y cho thuoc, dung nghi la xong. FAST 3 giay + 4 phong ngua lau dai.",vr:"Save rate 69% (108K/157K). BS 6M followers. CTA 'gui nhom gia dinh' cuc manh. 'Thoi gian chinh la nao bo' = neo ky uc.",sc:[5,2,1,4],d:1},
+  {stt:34,t:"Nattokinase - enzyme tu dau natto bao ve mach mau",cl:"E",tp:"T4",l:1698,s:2024,sv:958,p:["P1","P2","P3a"],ch:["A"],kol:"BS Wang Haiyang (121K)",dy:"https://v.douyin.com/0yg9IesKxZI/",nid:"34fc9dd971b2804d98f7d29e66f10030",ss:"3 co che: giam nhot mau + ngan huyet khoi, dieu hoa mo mau + huyet ap, chong oxy hoa bao ve noi mo. Disclaimer: khong thay thuoc.",vr:"Share > Like. Nguoi xem TIM MUA thuong hieu natto sau xem. Disclaimer tang trust. Template compliance-safe cho TPCN.",sc:[2,3,3,5],d:1},
+  {stt:41,t:"Hieu ve dot quy xuat huyet nao qua hoat hinh",cl:"D",tp:"T7",l:401,s:432,sv:95,p:["P1"],ch:["C"],kol:"BS Hoang Hai Thao (77K)",dy:"https://v.douyin.com/m_db7AxcK2o/",nid:"350c9dd971b280fcb39cff7177e20581",ss:"Hoat hinh minh hoa vo mach mau, mau chen ep mo nao. Canh bao nguoi cao tuoi huyet ap cao.",vr:"Engagement THAP (401 vs 100K+). Hoat hinh giam credibility. Chi phu hop kenh Do hoa.",sc:[1,1,1,3],d:1},
+  {stt:81,t:"BS tim mach: Xuong lau 10 phut gap 3 nguoi dot quy",cl:"G",tp:"T5",l:116627,s:22896,sv:3647,p:["P1","P2","P3a"],ch:["A"],kol:"BS Vuong (13.4M)",dy:"https://v.douyin.com/1Kk4N3DenMo/",nid:"350c9dd971b28050a784dfbde7fb5c9d",ss:"Xuong lau gap 3 BN dot quy. 50% di chung. Phong ngua: kiem soat tam cao + loi song.",vr:"Hook doi thuong bien benh thanh 'chuyen ben canh'. BS 13M followers. Comment kich hoat P2 va P3a manh.",sc:[5,3,2,4],d:1},
+  {stt:83,t:"Bai tap tay chan 3 buoc duong nao",cl:"F",tp:"T6",l:13275,s:1979,sv:5701,p:["P2","P3a"],ch:["A","B"],kol:"Tian Ning Lecture Hall",dy:"https://v.douyin.com/5Q-84B3mrbI/",nid:"350c9dd971b280fe91d1e135a2a40c68",ss:"3 buoc: xoay ngon cai 1p moi chieu, dan tay cha xat 1p, kieng chan 60 lan.",vr:"Save 44% - luu de LAM THEO. Dinh luong cuc ro (1 phut, 60 lan). De Viet hoa nhat - chi can dub voice.",sc:[3,2,2,5],d:1},
+  {stt:55,t:"Lam duoc 8 dieu nay, phong ngua 80% nhoi mau nao!",cl:"B",tp:"T1",l:69623,s:26082,sv:33405,p:["P1","P2","P3a"],ch:["A","B"],kol:"BS Vuong Tinh (13.4M)",dy:"https://v.douyin.com/kCA-lkDwlsA/",nid:"350c9dd971b280d8900ccc78a4f72244",ss:"8 dieu: An (12 loai/ngay), Van dong (150-300p/tuan), Can nang (BMI 18.5-23.9), Ngu (23h), Thuoc la, Mo mau, Duong huyet, Huyet ap.",vr:"'8'+'80%' = neo nho manh. Comment tranh luan (40% tieu cuc) nhung CHINH TRANH LUAN day engagement. Save 33K = checklist.",sc:[4,3,2,4],d:1},
+  {stt:27,t:"Thuc khuya pha huy nao bo, dong ho sinh hoc va he mien dich",cl:"A",tp:"T1",l:117153,s:28057,sv:475,p:["P1"],ch:["B","C"],kol:"Chai Zhidao (2.5M)",dy:"https://v.douyin.com/1xzZWEk_b0k/",nid:"34fc9dd971b280a3a432c3d0bfd33969",ss:"Giai thich khoa hoc: ngu de nao loai bo chat can ba, hinh thanh ky uc. Thuc khuya ton thuong than kinh man tinh, roi loan dong ho sinh hoc.",vr:"117K likes. '1/3 cuoc doi ngu' = neo so lieu manh. Hook '30 phut sau se cho biet nguyen nhan mat ngu' giu nguoi xem.",sc:[5,1,2,4],d:1},
+  {stt:39,t:"Nguoi 36 tuoi xuat huyet nao vi thuc khuya luot dien thoai",cl:"A",tp:"T2",l:1860,s:2331,sv:525,p:["P1"],ch:["A","B"],kol:"Truong Giang Van",dy:"https://v.douyin.com/03qyVzK4TgU/",nid:"34fc9dd971b280c4b496eb0b16f9a573",ss:"Anh Tuong 36 tuoi, HA 180/110 nhung khong uong thuoc deu. Thuc khuya luot DT den 2-3h sang. Xuat huyet nao, liet nua nguoi.",vr:"Share > Like. 'Ngu duoi 6 tieng, nguy co dot quy tang 4 lan' = so lieu soc. 'Lenh gioi nghiem dien thoai sau 23h' = CTA cu the.",sc:[2,1,2,5],d:1},
+  {stt:33,t:"Thanh nien 24 tuoi dot quy vi thuc khuya va an do giao",cl:"A",tp:"T2",l:1839,s:2295,sv:587,p:["P1"],ch:["A","B"],kol:"Di Nhat Hien Truong (7.7M)",dy:"https://v.douyin.com/kLkfnIZ8RgM/",nid:"34fc9dd971b28072914ddffc6145f4b6",ss:"24 tuoi bi dot quy sau 1 dem ngu. Nguyen nhan: thuc khuya, do giao, khong van dong. BS canh bao xu huong tre hoa.",vr:"Share > Like. Ca benh tuong phan (24 tuoi + dot quy) kich hoat tu nhan dien. Comment nhieu cam xuc bat luc.",sc:[2,1,2,5],d:1},
+  {stt:21,t:"Thanh nien 30 tuoi nhoi mau nao 3 lan/tuan vi bia va thuoc",cl:"A",tp:"T2",l:5525,s:4370,sv:957,p:["P1","P2"],ch:["A","B"],kol:"Hai Bao Tin Tuc (18.5M)",dy:"https://v.douyin.com/0jQUjVfYyh8/",nid:"349c9dd971b280268b76eabf33dd5047",ss:"30 tuoi, 5 chai bia/ngay, 2 goi thuoc. Nhoi mau nao cap tinh 3 lan trong 1 tuan. Video 6.78 giay sieu ngan.",vr:"Share > Like. So lieu luong hoa cuc manh: '30 tuoi, 1 tuan 3 lan, 5 chai bia, 2 goi thuoc'. Truyen thong 18.5M.",sc:[3,2,2,4],d:1},
+  {stt:23,t:"Nam thanh nien thuc khuya bi xuat huyet nao",cl:"A",tp:"T2",l:44907,s:28625,sv:7240,p:["P1"],ch:["B"],kol:"Nam Tu Giai Thuyet (320K)",dy:"https://v.douyin.com/5oqBU1uf1Cw/",nid:"349c9dd971b28010ab18fc9658c0d56d",ss:"TN thuc khuya choi game bi xuat huyet nao. Me khoc suy sup, phi phau thuat 300.000 NDT. Luu y: co quang cao bao hiem.",vr:"44K likes, 28K shares. Hook cam xuc manh (me khoc, phi phau thuat). Luu y: co product placement bao hiem.",sc:[4,1,2,3],d:1},
+  {stt:37,t:"Nhoi mau nao tre hoa - dau hieu canh bao va 3 thoi quen nguy hiem",cl:"A",tp:"T1",l:153562,s:50167,sv:38348,p:["P1"],ch:["A","B"],kol:"Zhu Zhu Xia (KOL suc khoe)",dy:"https://v.douyin.com/i1TMhjFEMo4/",nid:"34fc9dd971b28037aab5e9e1bcd89f65",ss:"So sanh mach mau ban than voi Lenin. 3 gia toc nhoi mau nao: ngoi lau, do an nhanh + tra sua, hut thuoc. Quy tac 120 nhan biet dot quy.",vr:"153K likes, 50K shares, 38K saves. Ket hop nhieu format: case + phan loai + checklist + mua vu. Comment 18K.",sc:[5,3,2,4],d:1},
+  {stt:29,t:"Tac mach mau khong phai do an thit ma do axit beo bao hoa",cl:"E",tp:"T4",p:["P1","P2"],ch:["A","B"],kol:"Zhu Zhu Xia",dy:"https://v.douyin.com/2hjoIWbFQw8/",nid:"34fc9dd971b2809bb74ee8b155fa9422",ss:"Pha vo quan niem 'an thit = tac mach'. Thu pham that la axit beo bao hoa. Protein la vat lieu sua mach mau.",vr:"Hook phan truc giac (80% nghi do thit). Vi von 'protein = nhua duong sua duong'. Bai tap gap co chan = CTA cu the.",sc:[4,2,2,5],d:1},
+  {stt:42,t:"Xuat huyet nao, liet nua nguoi - van kien tri tap di bo",cl:"I",tp:"T8",l:3321,s:4615,sv:281,p:["P2","P3a"],ch:["B"],kol:"Benh nhan tu quay",dy:"https://v.douyin.com/1xpfOhCGZ4Q/",nid:"350c9dd971b280a4934fc38e199c15cf",ss:"Video 15 giay: benh nhan xuat huyet nao liet nua nguoi kien tri tap di bo. Comment day benh nhan chia se kinh nghiem phuc hoi.",vr:"Share > Like (4.6K vs 3.3K). Canh that khong to ve tao long tin. Comment tro thanh cong dong ho tro lan nhau.",sc:[2,2,1,4],d:1},
+  {stt:82,t:"BS 30 nam kinh nghiem: Di chung nhoi mau nao - 3 diem phuc hoi",cl:"I",tp:"T1",l:11053,s:348,sv:2739,p:["P2","P3a"],ch:["A"],kol:"BS Mao Gengsheng (190K)",dy:"https://v.douyin.com/DsP6ZVbGoLQ/",nid:"350c9dd971b280e2937bc809f9f54085",ss:"3 diem: sinh hoat dieu do, giu tam trang on dinh, kiem soat an uong. Mo dau dong cam 'dung lo lang'.",vr:"Save >> Share (2.7K vs 348) = luu de ap dung. Pattern 'trust-first'. 0% comment tieu cuc.",sc:[3,2,1,4],d:1},
+  {stt:70,t:"Dot quy khong xay ra dot ngot - dau hieu canh bao (YHCT)",cl:"C",tp:"T3",l:3334,s:89,sv:394,p:["P1","P2","P3a"],ch:["A","B","C"],kol:"BS YHCT (660K)",dy:"https://v.douyin.com/xEW250pE6P8/",nid:"350c9dd971b280dc9f50efd287f300b1",ss:"Goc nhin YHCT: dam thap nhu bun lang bam thanh mach. Dau hieu: chong mat, tuc nguc, te bi tay chan. CANH BAO: co product placement.",vr:"Vi von 'dam thap nhu bun lang' cuc hay. Luu y: co product placement thuoc Dong Nhan Duong. 95% comment tich cuc.",sc:[2,3,1,3],d:1},
+  {stt:32,t:"Ba nguyen nhan chinh gay dot tu o nguoi tre",cl:"A",tp:"T1",l:12936,s:26892,sv:6997,p:["P1"],ch:["A","B"],kol:"BS An Trinh Hospital",dy:"https://v.douyin.com/-2swX0YTk10/",nid:"34fc9dd971b280ffa983ff3d7b3a5dcb",ss:"3 nguyen nhan dot tu: thuc khuya (90% ca dot tu tre), mat kiem soat cam xuc (tang 4.7x nguy co), ruou bia (luong an toan = 0). 60 van dot tu/nam.",vr:"Share 26K > Like 12K. 'Luong ruou an toan la bang khong' = pha vo dinh kien manh.",sc:[3,1,2,4],d:1},
+  {stt:38,t:"Thuc khuya den muc nao gay dot tu - 4 ranh gioi do",cl:"A",tp:"T1",l:248242,s:709438,sv:44091,p:["P1"],ch:["A","B"],kol:"Chao Xinwen (25.8M)",dy:"https://v.douyin.com/C630LjrWDCo/",nid:"34fc9dd971b280dc8eaccd730b25e403",ss:"4 ranh gioi do: hon 3 ngay ngu duoi 4h (co that mach tang 5x), thuc trang 24h (HA tang 15-20mmHg), dai han duoi 6h + benh man, thuc khuya + van dong manh.",vr:"VIDEO VIRAL NHAT TOAN DB: Share 709K! KOL 25.8M. Comment flood 'check in' 3-4h sang.",sc:[5,1,2,4],d:1},
+  {stt:28,t:"Ngu bao nhieu tieng quyet dinh suc khoe 10 nam sau",cl:"A",tp:"T1",l:28987,s:27020,sv:8507,p:["P1"],ch:["B","C"],kol:"KOL suc khoe",dy:"https://v.douyin.com/u4TAD8D6_iI/",nid:"34fc9dd971b280759e95e28173a898ff",ss:"Phan tich tung muc ngu 1h-12h: 4-6h la 'tu sat man tinh an hiem nhat', 6-8h = 'chuong trinh mac dinh trong gene'.",vr:"Share 27K ~ Like 28K. 'To ket qua kham 10 nam sau do ruc' = frame dai han manh.",sc:[3,1,2,4],d:1},
+  {stt:71,t:"Tam nguyen nhan gay dot quy va yeu to nguy co",cl:"B",tp:"T1",l:941,s:823,sv:223,p:["P1","P2","P3a"],ch:["A","C"],kol:"BS Zhang Hongqi, BV Tuyen Vu (188K)",dy:"https://v.douyin.com/AUXLEdfcJ70/",nid:"350c9dd971b28000af38ddc245c21543",ss:"8 nguyen nhan: HA cao, mo mau cao, duong huyet cao, thua can, thuoc la, benh tim (rung nhi), tien su gia dinh, it van dong.",vr:"Engagement thap nhung 70% comment tich cuc. Hook 'ban co may cai?' = tu doi chieu.",sc:[1,3,2,4],d:1},
+  {stt:72,t:"5 nhom de xuat huyet nao va 7 diem phong ngua",cl:"B",tp:"T1",p:["P1","P2","P3a"],ch:["A","C"],kol:"BS Tang (mach mau nao)",dy:"https://v.douyin.com/j7AVOep_YSk/",nid:"350c9dd971b2800a8c99de10200f90d0",ss:"5 nhom nguy co: HA cao, di dang mach (phinh mach/Moyamoya), benh mau, aspirin dai han, tien su dot quy. 7 diem phong ngua chi tiet.",vr:"85% comment tich cuc. Thao luan ve mau thuan aspirin vs xuat huyet = gap noi dung quan trong.",sc:[1,3,1,4],d:1},
+  {stt:35,t:"An lac moi ngay - nghien cuu phong ngua dot quy",cl:"E",tp:"T4",l:31042,s:45631,sv:14809,p:["P1","P2","P3a"],ch:["A","B"],kol:"BS Doan Hong Chau (83K)",dy:"https://v.douyin.com/ZTViKilzu_w/",nid:"34fc9dd971b2800b9785c803b626a454",ss:"Nghien cuu: an lac moi ngay giam nguy co dot quy thieu mau. Lac giau VitE, magie, protein, B vitamin - cai thien mo mau ha huyet ap.",vr:"Share 45K > Like 31K = viral spread. Hook phan truc giac 'lac phong dot quy'. Comment tranh luan lac song/chin.",sc:[4,2,3,5],d:1},
+  {stt:63,t:"2 loai thuc pham can han che de phong nhoi mau nao",cl:"E",tp:"T4",l:238889,s:8343,sv:43184,p:["P1","P2"],ch:["A","B"],kol:"BS Tang Tuong Dung",dy:"https://v.douyin.com/MNHKfhewvMI/",nid:"350c9dd971b280dba6b9dd3e13022dd7",ss:"2 loai: axit beo bao hoa (thit mo, bo, dau co, do chien) va cholesterol cao (noi tang dong vat). Hook '90% khong biet'.",vr:"Like 238K >> Share 8K (Save-dominant). Save 43K = luu tham khao. '90% khong biet' tao cam giac khan hiem. 95% comment tich cuc.",sc:[5,2,3,4],d:1},
+  {stt:26,t:"4 cau tam huyet cham soc mach mau tu BS Que Hoa",cl:"G",tp:"T5",l:5764,s:2969,sv:2513,p:["P1","P2","P3a"],ch:["A"],kol:"BS Que Hoa (680K)",dy:"https://v.douyin.com/0LwObRq1AMg/",nid:"349c9dd971b2807da862cb17ac08f11c",ss:"4 cau: it dau muoi duong (tranh tam cao), di bo nhanh 30p/ngay, bo thuoc han ruou, cam xuc on dinh. 'Ngu tot hon uong bo pham'.",vr:"95% comment tich cuc. 'Ngu tot hon uong bo pham' = pha dinh kien TPCN nhe. BS 680K.",sc:[2,3,2,5],d:1},
+  {stt:79,t:"Huyet Hop Cot - huyet van nang phong ngua dot quy",cl:"F",tp:"T6",p:["P2","P3a"],ch:["A","B"],kol:"KOL duong sinh",dy:"https://v.douyin.com/OZA2dYL2Wq0/",nid:"350c9dd971b28017a67ae6f7f4b5df94",ss:"Bam huyet Hop Cot thuong xuyen = phong dot quy. CANH BAO: claim 'suot doi khong bi dot quy' = phat ngon thoi phong.",vr:"Khong co engagement data. Claim thoi phong can chinh khi Viet hoa.",sc:[1,2,2,4],d:1},
+  {stt:78,t:"BS chia se phong ngua dot quy nhan Ngay Dot Quy TG",cl:"G",tp:"T5",l:14844,s:612,sv:633,p:["P1","P2","P3a"],ch:["A"],kol:"BS Tu Van Ban, BV ZJU (595K)",dy:"https://v.douyin.com/i9xhLec49xw/",nid:"350c9dd971b280088594e409ef53db6f",ss:"Nhan Ngay Dot Quy TG 29/10: 90% dot quy co the tranh duoc. Kiem soat tam cao, kham dinh ky, an nhat (muoi duoi 6g/ngay), van dong.",vr:"Timing World Stroke Day. BS 595K warm IP - 'may dua ngoc' = tone than mat. 95% comment tich cuc.",sc:[3,3,1,4],d:1},
+  {stt:86,t:"Phong ngua dot quy: 5 dieu BS tim mach khuyen",cl:"G",tp:"T1",l:2605,s:547,sv:580,p:["P1","P2","P3a"],ch:["A"],kol:"BS Truong Chi Danh",dy:"https://v.douyin.com/SCSAISPkoL4/",nid:"350c9dd971b280eeac37dff70e2c4e16",ss:"5 yeu to: HA, mo mau ('sat thu tham lang'), duong huyet, rung nhi, homocysteine (H-type hypertension).",vr:"95% comment tich cuc. Noi bat: de cap homocysteine va H-type = content gap quan trong. Nguoi xem search 'homocysteine cao nguyen nhan' sau xem.",sc:[2,3,2,4],d:1},
+  {stt:87,t:"10 cach phong ngua xuat huyet nao - GS BV Bac Y so 3",cl:"B",tp:"T1",p:["P1","P2","P3a"],ch:["A"],kol:"GS Liu Peng, BV Bac Y so 3",dy:"https://v.douyin.com/08VdM94zvis/",nid:"350c9dd971b28066990bee01e4079747",ss:"10 cach: kiem soat HA, ngu du giac, tam trang tot, dai tien thong suot, tap the duc vua phai, ha mo mau, bo thuoc ruou, chu y mua dong.",vr:"Hook '90% nguoi lam khong duoc dieu 7'. GS BV Bac Y uy tin. Format 10 diem = checklist de luu.",sc:[1,3,2,4],d:1},
+  {stt:80,t:"Phong ngua dot quy mua dong: 5 chi so can dat chuan",cl:"B",tp:"T1",l:25464,s:7450,sv:11720,p:["P1","P2","P3a"],ch:["A","B"],kol:"BS Vuong Tim mach (1347K)",dy:"https://v.douyin.com/oR0houSGMPc/",nid:"350c9dd971b2808eaa32c0a22b8b7cad",ss:"5 chi so can dat: HA (duoi 140/90), LDL (duoi 3.4/2.6/1.8), Triglyceride (duoi 1.7), Duong huyet (duoi 6.1), Homocysteine (duoi 10). 'Dung uong thuoc bua'.",vr:"25K likes. Pha vo quan niem sai 'Nguu Hoang Hoan + truyen dich phong dot quy'. 5 chi so dinh luong ro rang. 95% comment tich cuc.",sc:[4,3,2,4],d:1},
+  {stt:43,t:"Dau hieu canh bao som dot quy - phat hien som phong ngua som",cl:"C",tp:"T3",l:837,s:647,sv:393,p:["P1","P2","P3a"],ch:["A","C"],kol:"BS Thong Thong",dy:"https://v.douyin.com/CY4P-whgvOw/",nid:"350c9dd971b28060a10fe93de38a715b",ss:"Mua dong = mua cao diem dot quy. Canh bao cac dau hieu bat thuong la tin hieu dot quy. 'Nhat dinh phai xem het nhe.'",vr:"Share 647 > Like 837 (share rate cao). Timing mua dong. CTA chia se cho nguoi than.",sc:[1,3,1,4],d:1},
+  {stt:40,t:"Khoa hoc ve dot quy: Nguyen nhan, FAST, dieu tri va phong ngua",cl:"C",tp:"T3",l:300569,s:150498,sv:97327,p:["P1","P2","P3a"],ch:["A","C"],kol:"Lien minh Khoa hoc Y te (1.39M)",dy:"https://v.douyin.com/pEpufRU4ZDI/",nid:"350c9dd971b2809f81d6c4e41b544362",ss:"Mo dau: nguoi noi tieng (Trieu Ban Son, Luu Gia Huy) + so lieu (10 giay 1 nguoi phat benh). FAST chi tiet. Co che 2 loai. Dieu tri. Phong ngua: tam cao, xo vua. Ket: 'noi them mot lan voi nguoi than'.",vr:"300K likes, 150K shares, 97K saves = VIDEO KHONG LO trong DB. 60% comment tieu cuc (chia se kho dau gia dinh). CTA 'chia se cho bo me' = viral muc tieu.",sc:[5,3,1,4],d:1},
+  {stt:68,t:"6 buoc tam soat dot quy nao: tu HA den sieu am mach canh",cl:"C",tp:"T3",l:673,s:102,sv:211,p:["P1","P2","P3a"],ch:["A","C"],kol:"BS An Trinh Hieu Xuyen (342K)",dy:"https://v.douyin.com/HLVTa_lPWG0/",nid:"350c9dd971b2804f9eb8e38f62f7ff3a",ss:"6 buoc tam soat: kham co ban (HA), xet nghiem mau (mo/duong/homocysteine), sieu am mach canh, kham tim, hinh anh mach nao, nhom dac biet. 'Dot quy da canh bao tu lau, chi la ta khong di kiem tra.'",vr:"Engagement thap. Kim cu: '...khong di kiem tra' = neo nho manh. 70% comment tich cuc.",sc:[1,3,1,4],d:1},
+  {stt:31,t:"Mo noi tang - co che gay benh tim dot quy va 2 chien luoc",cl:"D",tp:"T5",l:80209,s:54498,sv:43422,p:["P1"],ch:["C"],kol:"Khong Luong (Kong Liang) (430K)",dy:"https://v.douyin.com/JMkWuzDAb0k/",nid:"34fc9dd971b28047818ad79d89776a26",ss:"Co che: mo noi tang -> viem man tinh -> xo vua -> huyet khoi -> dot quy. 2 chien luoc: (1) an uong gioi han thoi gian 8h (giam mo noi tang 11-27%), (2) chat xo hoa tan (butyrate = chong viem tu nhien).",vr:"80K likes, 54K shares, 43K saves. Format dai 7p32s. 'Nhom loi ich' + 'cuu nguoi than' = keo viral share. 45% comment trung tinh.",sc:[5,1,2,4],d:1},
+  {stt:77,t:"Huyet Trung Xung - an 3 phut moi ngay phong nhoi mau nao",cl:"F",tp:"T6",l:17440,s:14474,sv:18032,p:["P2","P3a"],ch:["A","B"],kol:"BS Dong y tien si",dy:"https://v.douyin.com/Nf6aw5qkf60/",nid:"350c9dd971b280158c72c6c6a54d0877",ss:"Huyet Trung Xung (dau ngon giua - Luc Mach Than Kiem Doan Du). Bam 2-3 lan/ngay, moi lan 3 phut. Cho nguoi co chong mat, dau dau, te bi.",vr:"Save 18K > Share 14K > Like 17K = luu huyet dao de ap dung. Tham khao phim Thien Long Bat Bo = tang thu vi. 85% comment tich cuc.",sc:[3,2,2,4],d:1},
+  {stt:54,t:"Lam duoc 5 dieu nay, 80% ca dot quy co the phong ngua",cl:"B",tp:"T1",l:5713,s:1803,sv:389,p:["P1","P2","P3a"],ch:["A","B"],kol:"TS Hoc Le, BV ND so 3 Thanh Do (650K)",dy:"https://v.douyin.com/R3CWZYp_QYM/",nid:"350c9dd971b28084aff7df3cab865c06",ss:"5 diem: HA (tang 20mmHg = tang 28% nguy co), an lanh manh, van dong 150p/tuan, bo thuoc la (x2 nguy co), can nang chuan. Nguồn: Huong dan cap 2 cua Hiep hoi Tim mach + Dot quy.",vr:"'Phuong phap da day, con lam nhu the nao la o quy vi' = CTA manh. 85% comment tich cuc.",sc:[2,3,2,4],d:1},
+  {stt:88,t:"Tai sao mach mau bi tac/vo - truyen dich thong mach co hieu qua?",cl:"D",tp:"T7",l:12210,s:1861,sv:4813,p:["P1"],ch:["C"],kol:"BS Tong Pho (3.58M)",dy:"https://v.douyin.com/sTg35HVGDHs/",nid:"350c9dd971b280cfad9af3fbaec85b5b",ss:"Co che xo vua: LDL tham vao thanh mach -> mac bam -> nut vo -> huyet khoi -> dot quy. PHA VO: 'Truyen dich thong mach vo dung'. Vi von hay: 'mach mau nhu ong nuoc'.",vr:"12K likes. Pha vo quan niem sai lon nhat VN. 95% comment tich cuc. KOL 3.58M.",sc:[3,1,2,4],d:1},
+  {stt:51,t:"Tai sao dot quy xay ra dot ngot - co che xo vua",cl:"D",tp:"T5",l:349,s:319,sv:244,p:["P1","P2","P3a"],ch:["A","C"],kol:"BS Vuong Tim mach (353K)",dy:"https://v.douyin.com/3TyUBLGWetg/",nid:"350c9dd971b2803288b3f13722e8611d",ss:"Giai thich: mach cung dan + mac bam + kich thich cam xuc -> mach vo -> dot quy. 'Tieu dot quy' (TIA): te tay/chan, mat den la canh bao. CANH BAO: co product placement To Hop Huong Hoan.",vr:"Engagement cuc thap. Noi bat: giai thich TIA rat ro. Product placement can xoa khi reup.",sc:[1,3,1,3],d:1},
+  {stt:47,t:"Dot quy: Sat thu hang dau giet chet bo nao",cl:"D",tp:"T7",l:43001,s:8009,sv:13802,p:["P1","P2","P3a"],ch:["C"],kol:"KOL y te infotainment",dy:"https://v.douyin.com/XeG5mEBlJtM/",nid:"350c9dd971b280ab95a5d7e969f74868",ss:"Narrative 1st-person ('Ta la dot quy'). So lieu: 12 giay 1 nguoi be nga, 21 giay 1 nguoi chet, 39.9% nguy co suot doi. Co che 2 loai + di chung (liet, mat ngon ngu, closed-in syndrome). FAST.",vr:"43K likes, 8K shares, 13K saves. 80% comment 'ca nha tranh xa' = cyber prayer. 'Mot giay = 1.9 trieu te bao nao chet' = neo nho cuc manh.",sc:[4,3,1,4],d:1},
+  {stt:67,t:"Van dong phong nhoi mau nao - cung van dong nao!",cl:"F",tp:"T6",l:39261,s:30303,sv:57202,p:["P2","P3a"],ch:["B","C"],kol:"BS Ngoai khoa Ly (1.99M)",dy:"https://v.douyin.com/x9PSadFbnr4/",nid:"350c9dd971b2806cabaff519f8dc5117",ss:"BS demo 4-5 dong tac van dong phong nhoi mau nao (nhon got, xoay tay...). Moi dong tac co so lan cu the. Khong can dung cu.",vr:"Save 57K (!) - CUC CAO: nguoi xem luu de lam theo. Share 30K > Like 39K = viral tool. 92% comment tich cuc.",sc:[4,2,2,5],d:1},
+  {stt:53,t:"Luyen tap hang ngay phong dot quy nao",cl:"F",tp:"T6",l:1811,s:2334,sv:2201,p:["P2","P3a"],ch:["B","C"],kol:"BS Banh Khoa",dy:"https://v.douyin.com/_zE4-Kgyl-Y/",nid:"350c9dd971b2809f9154e45eb034cca0",ss:"'Phong ngua dot quy nao, luyen tap moi ngay'. BS demo dong tac ngan gon. Moi ngay 5-10 phut.",vr:"Share+Save > Like = 'thong tin huu ich'. BS tra loi tung comment = tang gan ket. 57% comment tich cuc.",sc:[2,2,2,5],d:1},
+  {stt:50,t:"Hoi han khong nghe vo - ruou bia thuoc la, 30 tuoi dot quy",cl:"H",tp:"T8",p:["P2"],ch:["B"],kol:"Benh nhan quay",dy:"https://v.douyin.com/akZqk61cfxk/",nid:"350c9dd971b280f7bf99d0dc3f22afc2",ss:"Benh nhan tren 30 tuoi dot quy vi ruou bia (ruou trang 1.5 chai, bia thoai mai) + 2 goi thuoc/ngay. 'Hoi han vi khong nghe vo khuyen'.",vr:"Khong co engagement data. Cluster H - hoi han - core content gap cho Genkifami P2.",sc:[2,2,2,4],d:1},
+  {stt:52,t:"Dot quy tai phat nguy hiem hon lan dau - 3 buoc phong ngua",cl:"I",tp:"T3",p:["P2","P3a"],ch:["A","B"],kol:"BS khoa hoc dot quy",dy:"https://v.douyin.com/_SJl2LpAp9A/",nid:"350c9dd971b280798b2be2c2127cd218",ss:"Tai phat nang hon lan dau (liet nua nguoi, mat ngon ngu). 3 buoc phong ngua: (1) kiem soat chi so + dung thuoc, (2) phong huyet khoi, (3) che do an it muoi/beo/duong. CANH BAO: co product placement Sanqi Tongshu.",vr:"95% comment tich cuc, 0% tieu cuc. Cluster I = benh nhan + nguoi than can info hang dau. Product placement can xoa khi reup.",sc:[1,2,1,3],d:1},
+];
+
+const TM=[
+  {id:"T1",n:"Phá vỡ định kiến + N nhóm + Khẩu quyết",ch:["A","C"],p:["P1","P2","P3a"],eg:"Comment + Tag",
+    st:["Hook phá vỡ định kiến (5-10s)","Ca bệnh dẫn nhập (10-15s)","Phân loại N nhóm + ví von (60-90s)","Khẩu quyết hành động (15-20s)","Kêu gọi lưu/chia sẻ (5s)"],
+    hk:['"8 điều này làm được, phòng 80% nhồi máu não"','"Đột quỵ KHÔNG là tai họa trời giáng."'],
+    mt:["Mạch máu = ống cao su mục","Mảng bám = cặn nước vôi","Xơ vữa = giòn như thủy tinh"],
+    nt:"Số nhóm tốt nhất 3-5.",rv:{t:"Làm 8 điều, phòng 80% nhồi máu não",nid:"350c9dd971b280d8900ccc78a4f72244",eg:"69.6K likes, 33.4K saves"},
+    pa:[{p:"Định lượng",a:1,d:'"8 điều", "80%", "12 loại/ngày", BMI 18.5-23.9 — mỗi lời khuyên đều có con số cụ thể, người xem biết chính xác phải làm gì'},
+        {p:"Ví von đời thường",a:1,d:'"Thuốc hối hận" — ví von đơn giản nhưng đắt giá, P2/P3a ngay lập tức hiểu hệ quả'},
+        {p:"CTA cụ thể",a:1,d:'"Chia sẻ để nhiều người tránh xa nhồi máu não" — CTA gắn với động lực lợi tha, không phải lệnh đơn thuần'},
+        {p:"Disclaimer",a:0,d:"Không cần — đây là video phòng ngừa chung, không claim sản phẩm"},
+        {p:"Bác sĩ thật face-cam",a:1,d:"BS Vương Tinh 13.4M followers xuất hiện trực tiếp → trust ngay từ giây đầu"}]},
+  {id:"T2",n:"Reversal Case + Cảnh báo diện rộng",ch:["A","B"],p:["P1"],eg:"Share viral",
+    st:["Hook: tuổi trẻ + bệnh nặng (5s)","Chi tiết ca bệnh (15-20s)","BS phân tích nguyên nhân (15-20s)","Cảnh báo + số liệu (10s)"],
+    hk:['"SV 19 tuổi đột ngột liệt nửa người vì thức khuya..."'],mt:[],nt:"Ca bệnh phải có nguồn. Reup ghi rõ nguồn TQ.",
+    rv:{t:"SV 19 tuổi đột quỵ vì thức khuya",nid:"34fc9dd971b280e49d76eeba2d915b75",eg:"46K likes, 197K shares"},
+    pa:[{p:"Định lượng",a:1,d:'"19 tuổi", "1 tiếng lấy huyết khối" — tuổi cực trẻ tạo tương phản sốc, thời gian cứu sống được định lượng cụ thể'},
+        {p:"Ví von đời thường",a:0,d:"Không dùng ví von — sức mạnh nằm ở câu chuyện thật, không cần ẩn dụ bổ sung"},
+        {p:"CTA cụ thể",a:1,d:'"Đột quỵ từ lâu không còn là bệnh người già" — CTA gián tiếp, kéo P1 tự nhận diện rủi ro của bản thân'},
+        {p:"Disclaimer",a:0,d:"Không cần — đây là tin tức thực tế, không claim điều trị gì"},
+        {p:"Bác sĩ thật face-cam",a:0,d:"Truyền thông 41M followers thay thế bác sĩ — vẫn hiệu quả vì nguồn uy tín cao"}]},
+  {id:"T3",n:"Checklist khẩn cấp - X điều tuyệt đối",ch:["A"],p:["P2","P3a"],eg:"Save cực cao",
+    st:["Số liệu sốc (15s)","X điều: lỗi sai + cách đúng (60-90s)","FAST 3 giây (15s)","Phòng ngừa lâu dài (15-20s)","CTA: lưu + gửi nhóm GĐ (5s)"],
+    hk:['"5 việc TUYỆT ĐỐI đừng làm khi người thân đột quỵ."'],mt:[],nt:"SAVE cao nhất. 1 video/tháng.",
+    rv:{t:"5 điều tuyệt đối khi đột quỵ",nid:"34fc9dd971b28007a8a6edc6a5ae7da5",eg:"157K likes, 108K saves (69%)"},
+    pa:[{p:"Định lượng",a:1,d:'"39.3% nguy cơ suốt đời", "1.9 triệu tế bào/phút", "17% tái phát" — số liệu sốc xuyên suốt, mỗi điều đều có con số'},
+        {p:"Ví von đời thường",a:1,d:'"Thời gian chính là não bộ" — ví von ngắn gọn nhưng cực mạnh, P2/P3a nhớ ngay'},
+        {p:"CTA cụ thể",a:1,d:'"Lưu 1 lần, hiểu kỹ 1 lần, chia sẻ 1 lần" — CTA hay nhất toàn DB, gắn với hành động lợi tha'},
+        {p:"Disclaimer",a:0,d:"Không cần — video hướng dẫn sơ cứu, không claim sản phẩm"},
+        {p:"Bác sĩ thật face-cam",a:1,d:"BS Bắc Thế Ninh 6M followers, áo blouse + phòng khám thực → trust cao nhất phân khúc C"}]},
+  {id:"T4",n:"Sản phẩm: Cơ chế + Cách dùng + Ranh giới",ch:["A"],p:["P1","P2","P3a"],eg:"Share + Search SP",
+    st:["BS dẫn nhập từ khám (10-15s)","Định nghĩa + ví von (10-15s)","3 cơ chế tác động (45-60s)","Cách dùng + lưu ý (20-30s)","DISCLAIMER bắt buộc (10s)"],
+    hk:['"Trong khám bệnh hàng ngày, nhiều người trung niên rất quan tâm [Hoạt chất X]..."'],
+    mt:["Người dọn dẹp mạch máu","Lá chắn cho thành mạch"],nt:"QUAN TRỌNG NHẤT cho TPCN. DISCLAIMER BẮT BUỘC.",
+    rv:{t:"Nattokinase - enzyme bảo vệ mạch máu",nid:"34fc9dd971b2804d98f7d29e66f10030",eg:"1.7K likes, 2K shares"},
+    pa:[{p:"Định lượng",a:1,d:'"3 cơ chế" cụ thể, cách dùng rõ (nước ấm/sữa) — người xem biết chính xác uống thế nào'},
+        {p:"Ví von đời thường",a:1,d:'"Người dọn dẹp mạch máu" — metaphor hay nhất DB, P2/P3a hiểu ngay chức năng mà không cần y học'},
+        {p:"CTA cụ thể",a:1,d:"Chi tiết cách dùng → người xem tự tìm mua ngay sau xem"},
+        {p:"Disclaimer",a:1,d:'MẪU CHUẨN: "Không thay thuốc điều trị. Có bệnh vẫn phải đến BV." — được khán giả đánh giá CAO, tăng trust'},
+        {p:"Bác sĩ thật face-cam",a:1,d:"BS Ngoại mạch máu — dùng đúng chuyên môn, không nhầm chuyên khoa"}]},
+  {id:"T5",n:"Lifestyle Hook - 'Tôi gặp X ca trong Y phút'",ch:["A"],p:["P1","P2","P3a"],eg:"Like + Comment",
+    st:["Hook scene đời thường (10s)","Phân tích chuyên môn (15-20s)","Khuếch đại tác hại (15s)","Giải pháp 4-5 điểm (20-30s)","Kêu gọi cảm xúc (10s)"],
+    hk:['"Xuống lầu chưa 10 phút, gặp 3 BN đột quỵ."'],mt:[],nt:"BẮT BUỘC face-cam BS thật. Hook GỌN - 10 giây đầu quyết định.",
+    rv:{t:"BS xuống lầu 10 phút gặp 3 ca",nid:"350c9dd971b28050a784dfbde7fb5c9d",eg:"116K likes"},
+    pa:[{p:"Định lượng",a:1,d:'"10 phút", "3 người", "50% di chứng" — toàn bộ hook là số liệu, không có câu nào mơ hồ'},
+        {p:"Ví von đời thường",a:1,d:"Toàn bộ premise là 1 ví von lớn: 'xuống lầu đi dạo' = bệnh ở ngay bên cạnh"},
+        {p:"CTA cụ thể",a:1,d:'"Để con được đi đứng bình thường, sống tốt — bắt đầu từ chính mình" — kết thúc bằng lý do cảm xúc'},
+        {p:"Disclaimer",a:0,d:"Không cần — video kinh nghiệm lâm sàng, không claim sản phẩm"},
+        {p:"Bác sĩ thật face-cam",a:1,d:"BS Vương 13.4M — top authority trong toàn bộ DB, hook đời thường kết hợp uy tín bác sĩ"}]},
+  {id:"T6",n:"Demo Tutorial - X bước có định lượng",ch:["A","B"],p:["P2","P3a"],eg:"Save cao",
+    st:["Câu mở giá trị (5-10s)","Bước 1 - định lượng (15-20s)","Bước 2 - định lượng (15-20s)","Bước 3 + khuyến khích (15-20s)"],
+    hk:['"Lo nhồi máu não? 3 bước đơn giản dưỡng não."'],mt:[],nt:"60-90s. Không 'xoay vài lần' mà 'xoay 1 phút'. Lý tưởng Việt hóa.",
+    rv:{t:"Bài tập tay chân 3 bước dưỡng não",nid:"350c9dd971b280fe91d1e135a2a40c68",eg:"13K likes, 5.7K saves (44%)"},
+    pa:[{p:"Định lượng",a:1,d:'"1 phút", "60 lần", "3 bước" — mỗi bước đều có con số. Áp dụng tốt nhất trong toàn DB'},
+        {p:"Ví von đời thường",a:0,d:"Không cần ví von — demo trực quan thay thế hoàn toàn"},
+        {p:"CTA cụ thể",a:1,d:'"Học được chưa? Hãy thử áp dụng" — CTA nhẹ, không áp lực, phù hợp content thực hành'},
+        {p:"Disclaimer",a:0,d:"Không cần — đây là bài tập, không phải điều trị"},
+        {p:"Bác sĩ thật face-cam",a:0,d:"KOL sức khỏe demo trực tiếp — vẫn hiệu quả vì khán giả tập theo được ngay"}]},
+  {id:"T7",n:"Hoạt hình giải thích cơ chế",ch:["C"],p:["P1"],eg:"View depth",
+    st:["Dẫn vấn đề (10s)","Animation cơ chế (60-90s)","Kết luận cảnh báo (15-20s)"],
+    hk:[],mt:[],nt:"Engagement THẤP. Chỉ kênh Đồ họa.",
+    rv:{t:"Hoạt hình xuất huyết não",nid:"350c9dd971b280fcb39cff7177e20581",eg:"401 likes"},
+    pa:[{p:"Định lượng",a:0,d:"Ít số liệu — đây là điểm yếu lớn nhất, animation thay thế nhưng thiếu con số neo nhớ"},
+        {p:"Ví von đời thường",a:0,d:"Animation thay ví von nhưng kém hiệu quả hơn lời kể trực tiếp của bác sĩ"},
+        {p:"CTA cụ thể",a:0,d:"Yếu — chỉ 'chú ý sức khỏe' chung chung, không gắn với hành động cụ thể"},
+        {p:"Disclaimer",a:0,d:"Không cần — giải thích cơ chế thuần túy"},
+        {p:"Bác sĩ thật face-cam",a:0,d:"KHÔNG có face-cam = nguyên nhân chính engagement thấp, khán giả mất kết nối cảm xúc"}]},
+  {id:"T8",n:"Hối hận POV người trong cuộc",ch:["B","A"],p:["P2"],eg:"Share nhóm phụ nữ",
+    st:["POV mở: tự kể (10s)","Thói quen xấu (20-30s)","Tình trạng hiện tại (15-20s)","'Đừng như tôi' (10-15s)"],
+    hk:['"Tôi từng nghĩ còn trẻ — đến khi liệt nửa người..."'],mt:[],nt:"70% cảnh báo, 30% hy vọng. TRÁNH thể lương quá.",
+    rv:{t:"Hối hận không nghe vợ - 30 tuổi đột quỵ",nid:"350c9dd971b280f7bf99d0dc3f22afc2",eg:"Chưa có data"},
+    pa:[{p:"Định lượng",a:1,d:'"Rượu trắng 1 chai rưỡi", "2 gói thuốc/ngày", "hơn 30 tuổi" — định lượng hành vi xấu rất cụ thể, P2 nhận ra ngay chồng/người thân'},
+        {p:"Ví von đời thường",a:0,d:"Không cần ví von — câu chuyện thật đủ sức mạnh, thêm ví von sẽ làm loãng"},
+        {p:"CTA cụ thể",a:1,d:"Implicit CTA: 'Đừng như tôi' — phụ nữ tự SHARE cho chồng/em trai mà không cần kêu gọi"},
+        {p:"Disclaimer",a:0,d:"Không cần — POV bệnh nhân không claim điều trị"},
+        {p:"Bác sĩ thật face-cam",a:0,d:"POV người trong cuộc — không cần bác sĩ, chính xác thực của nhân vật tạo trust"}]},
+];
+
+const TG=[
+  {g:"Tìm kiếm & Tầm soát",d:'"Lam sao biet minh co nguy co?"',ts:[
+    {t:"Phinh mach vs xo vua - khac nhau?",src:"Comment cluster B",p:["P1"],f:2,pr:1,sc:2},
+    {t:"Kiem tra mach mau (CT/MRI)",src:"Comment cluster B, C",p:["P1","P3a"],f:3,pr:1,sc:2},
+    {t:"Nhoi mau vs xuat huyet - phan biet?",src:"Comment cluster C, D",p:["P1","P2","P3a"],f:3,pr:1,sc:3},
+    {t:"Mang bam dong mach canh",src:"Comment BS Vuong + 8 dieu",p:["P2","P3a"],f:2,pr:2,sc:2},
+  ]},
+  {g:"Chỉ số sức khỏe",d:'"Chi so cua toi nguy hiem khong?"',ts:[
+    {t:"Triglyceride cao lam gi?",src:"Comment '8 dieu'",p:["P1","P2"],f:1,pr:1,sc:2},
+    {t:"Huyet ap thap co dot quy?",src:"Comment BS Vuong",p:["P1"],f:1,pr:1,sc:2},
+  ]},
+  {g:"Sản phẩm & hoạt chất",d:'"Mua gi, dung the nao?" - Co hoi TPCN',ts:[
+    {t:"Nattokinase: thuong hieu, lieu?",src:"Comment Nattokinase - tim mua",p:["P2","P3a"],f:2,pr:3,sc:3},
+  ]},
+  {g:"Thói quen & lifestyle",d:'"Thoi quen nay anh huong sao?"',ts:[
+    {t:"Ruou bia anh huong dot quy cu the?",src:"'8 dieu' khong de cap",p:["P1","P2"],f:2,pr:1,sc:2},
+    {t:"Gian tinh mach co tap duoc?",src:"Comment bai tap 3 buoc",p:["P2","P3a"],f:1,pr:1,sc:2},
+  ]},
+];
+
+// ============ RENDER HELPERS ============
+function badge(text,bg,color,border){
+  return `<span class="badge" style="background:${bg||'#334155'};color:${color||'#94a3b8'};${border?`border:1px solid ${border}`:''}">
+    ${text}</span>`;
+}
+function pbadges(p){
+  if(p.length>=3)return badge('Cross','#a855f722','#a855f7','#a855f744');
+  return p.map(x=>badge(x,PC[x]+'22',PC[x],PC[x]+'44')).join('');
+}
+function cbadges(ch){
+  return (ch||[]).map(x=>`<span title="${CH[x].n}" style="font-size:11px;margin-right:2px">${CH[x].i}</span>`).join('');
+}
+function notionLink(nid,text){
+  return `<a class="notion-link" href="https://app.notion.com/p/${nid}" target="_blank" rel="noreferrer">${text}</a>`;
+}
+function sc2col(v){return v>=4?'#f59e0b':v>=3?'#3b82f6':'#94a3b8'}
+
+// ============ TAB 1: OVERVIEW ============
+function renderTab1(){
+  const ct={};
+  CL.forEach(c=>{ct[c.id]={tot:0,det:0,ch:{A:0,B:0,C:0}}});
+  V.forEach(v=>{
+    if(ct[v.cl]){ct[v.cl].tot++;if(v.d)ct[v.cl].det++;(v.ch||[]).forEach(ch=>{if(ct[v.cl].ch[ch]!==undefined)ct[v.cl].ch[ch]++})}
+  });
+  const det=V.filter(v=>v.d).length;
+  return `
+  <h2 style="font-size:18px;font-weight:700;color:#e2e8f0;margin:0 0 4px">Tổng quan kho video</h2>
+  <p style="color:#94a3b8;font-size:12px;margin:0 0 12px">${V.length} video | ${det} đã phân tích chi tiết | 9 cluster | 8 template</p>
+  <div style="background:#1e293b;border-radius:8px;padding:8px 12px;margin-bottom:12px;display:flex;gap:16px;flex-wrap:wrap;font-size:11px">
+    <span style="color:#94a3b8;font-weight:700">Kênh:</span>
+    ${Object.entries(CH).map(([k,v])=>`<span style="color:${v.c}">${v.i} ${v.n}</span>`).join('')}
+  </div>
+  <div class="grid-auto">
+    ${CL.map(c=>{const vc=ct[c.id];return`
+    <div class="card" style="border-top:3px solid ${c.c}">
+      <div class="flex justify-between" style="margin-bottom:6px">
+        <div class="flex gap-2 items-center">
+          <span style="font-size:20px">${c.i}</span>
+          <div>
+            <div style="font-size:13px;font-weight:700;color:#e2e8f0">${c.id}. ${c.n}</div>
+            <div style="font-size:10px;color:#94a3b8">${c.d}</div>
+          </div>
+        </div>
+        <div style="text-align:right">
+          <div class="num-big" style="color:${c.c}">${vc.tot}</div>
+          <div style="font-size:9px;color:#64748b">${vc.det} chi tiết</div>
+        </div>
+      </div>
+      <div style="margin-bottom:6px">${pbadges(c.p)}${badge(TL[c.t],'','',TC[c.t]+'44')}</div>
+      <div class="flex gap-2" style="margin-bottom:6px">
+        ${['A','B','C'].map(ch=>`<div style="flex:1;background:#0f172a;border-radius:5px;padding:3px 0;text-align:center">
+          <div style="font-size:13px;font-weight:700;color:${vc.ch[ch]>0?'#e2e8f0':'#334155'}">${vc.ch[ch]}</div>
+          <div style="font-size:8px;color:#64748b">${CH[ch].i} ${CH[ch].n}</div>
+        </div>`).join('')}
+      </div>
+      <div style="font-size:9px;color:#64748b;margin-bottom:2px">Ưu tiên TPCN</div>
+      <div class="progress-bar"><div class="progress-fill" style="background:${c.c};width:${c.pr/5*100}%"></div></div>
+      <div style="font-size:9px;color:${c.c};margin-top:2px;font-weight:700">${c.pr}/5${c.pr>=4?' - Gần trực tiếp TPCN':c.pr>=3?' - Ưu tiên cao':' - Hỗ trợ'}</div>
+    </div>`}).join('')}
+  </div>
+  <div style="margin-top:20px" class="card">
+    <h3 style="font-size:14px;font-weight:700;color:#e2e8f0;margin:0 0 10px">Phân bố theo Trigger mua hàng</h3>
+    <div class="grid-3">
+      ${[{k:'direct',l:'Trực tiếp',d:'Video -> Tìm mua sản phẩm'},{k:'indirect',l:'Gián tiếp',d:'Video -> Nhận thức → Giải pháp'},{k:'trust',l:'Xây trust',d:'Uy tín kênh → Convert sau'}].map(t=>`
+      <div class="dark-box">
+        <div style="font-size:12px;font-weight:700;color:${TC[t.k]};margin-bottom:3px">${t.l}</div>
+        <div style="font-size:10px;color:#94a3b8;margin-bottom:6px">${t.d}</div>
+        ${CL.filter(c=>c.t===t.k).map(c=>badge(c.i+' '+c.id+'. '+c.n,c.c+'22',c.c,c.c+'44')).join('')}
+      </div>`).join('')}
+    </div>
+  </div>`;
+}
+
+// ============ TAB 2: VIDEO BANK ============
+let curFilter='all';let expandedIdx=null;
+
+function renderTab2(){
+  let fl=[...V];
+  if(curFilter==='det')fl=fl.filter(v=>v.d);
+  else if(curFilter!=='all')fl=fl.filter(v=>v.cl===curFilter);
+  fl.sort((a,b)=>{const pa=avg(a),pb=avg(b);if(pa&&pb)return pb-pa;if(pa)return-1;if(pb)return 1;return 0});
+
+  const filterHtml=`
+  <div class="filter-bar">
+    <h2 style="font-size:18px;font-weight:700;color:#e2e8f0;margin:0 0 4px">Ngân hàng Video</h2>
+    <p style="color:#94a3b8;font-size:11px;margin:0 0 6px">Click để xem chi tiết | Đang xem <strong style="color:#f59e0b">${fl.length}</strong>/${V.length}</p>
+    <div style="display:flex;flex-wrap:wrap;gap:3px">
+      <button class="filter-btn ${curFilter==='all'?'active':''}" onclick="setFilter('all')">Tất cả (${V.length})</button>
+      <button class="filter-btn" style="${curFilter==='det'?'background:#f59e0b;color:#000;border-color:#f59e0b':''}" onclick="setFilter('det')">Đã phân tích (${V.filter(v=>v.d).length})</button>
+      ${CL.map(c=>{const cnt=V.filter(v=>v.cl===c.id).length;const act=curFilter===c.id;
+        return`<button class="filter-btn" style="${act?`background:${c.c}33;color:${c.c};border-color:${c.c}66`:''}" onclick="setFilter('${c.id}')">${c.i} ${c.id} (${cnt})</button>`}).join('')}
+    </div>
+  </div>`;
+
+  const listHtml=fl.map((v,i)=>{
+    const cl=CL.find(c=>c.id===v.cl);const p=avg(v);const isExp=expandedIdx===i;
+    return`<div class="card-sm bordered-left" style="border-color:${cl?cl.c:'#334155'}" onclick="toggleExpand(${i})">
+      <div class="flex justify-between items-center">
+        <div style="flex:1;min-width:0">
+          <div class="flex items-center gap-2" style="margin-bottom:3px">
+            ${v.d?badge('Chi tiết','#f59e0b22','#f59e0b'):''}
+            ${badge((cl?cl.i+' ':'')+v.cl+(cl?' . '+cl.n:''), (cl?cl.c:'#666')+'22', cl?cl.c:'#666')}
+            ${cbadges(v.ch)}
+          </div>
+          <div style="font-size:12px;font-weight:600;color:#e2e8f0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${v.t}</div>
+          ${v.kol?`<div style="font-size:9px;color:#64748b;margin-top:1px">${v.kol}</div>`:''}
+        </div>
+        <div class="flex items-center" style="gap:8px;flex-shrink:0;margin-left:8px">
+          ${v.l?`<div style="font-size:10px;color:#94a3b8;white-space:nowrap">L:${f(v.l)} S:${f(v.s)} Sv:${f(v.sv)}</div>`:''}
+          ${p?`<div style="background:${parseFloat(p)>=3?'#f59e0b22':'#64748b22'};color:${parseFloat(p)>=3?'#f59e0b':'#64748b'};padding:3px 7px;border-radius:6px;font-size:13px;font-weight:800">${p}</div>`:''}
+          <span class="chevron ${isExp?'rotated':''}">▼</span>
+        </div>
+      </div>
+      ${isExp&&v.d?`<div class="expand-detail" onclick="event.stopPropagation()">
+        <div class="grid-2" style="margin-bottom:10px">
+          <div><div class="lbl">Script tóm tắt</div><div class="txt-sm">${v.ss}</div></div>
+          <div><div class="lbl">Lý do Viral</div><div class="txt-sm">${v.vr}</div></div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:10px">
+          ${['Engagement','Persona','Trigger','Viet hoa'].map((s,j)=>`<div class="score-box">
+            <div style="font-size:16px;font-weight:800;color:${sc2col(v.sc[j])}">${v.sc[j]}/5</div>
+            <div style="font-size:8px;color:#64748b">${s}</div>
+          </div>`).join('')}
+        </div>
+        <div>${pbadges(v.p)}
+          ${v.dy?`<a class="notion-link" href="${v.dy}" target="_blank">Douyin</a>`:''}
+          ${notionLink(v.nid,'Notion (full script + viral)')}
+        </div>
+      </div>`:''}
+      ${isExp&&!v.d?`<div class="expand-detail" onclick="event.stopPropagation()">
+        <div style="font-size:11px;color:#94a3b8;font-style:italic;margin-bottom:6px">Chưa phân tích chi tiết</div>
+        ${notionLink(v.nid,'Mở trong Notion')}
+      </div>`:''}
+    </div>`;
+  }).join('');
+
+  return filterHtml+`<div style="display:flex;flex-direction:column;gap:6px;margin-top:8px">${listHtml}</div>`;
+}
+
+// ============ TAB 3: PLAYBOOK ============
+let expandedTM=null;
+function renderTab3(){
+  return`
+  <h2 style="font-size:18px;font-weight:700;color:#e2e8f0;margin:0 0 4px">Narrative Playbook</h2>
+  <p style="color:#94a3b8;font-size:11px;margin:0 0 12px">8 template kể chuyện viral. Click de xem cau truc + video mau.</p>
+  <div class="card" style="margin-bottom:12px">
+    <h3 style="font-size:12px;font-weight:700;color:#f59e0b;margin:0 0 6px">5 nguyên tắc xuyên template</h3>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:5px">
+      ${['"Định lượng" > "chung chung" - 5 nhom, 3 buoc, 39.3%','"Ví von đời thường" > "thuật ngữ" - mach mau = ong cao su muc','"Hành động cụ thể" > "khuyên chung" - luu + gui nhom GD','"Disclaimer" TĂNG trust - "khong thay thuoc" duoc danh gia CAO','"Bác sĩ thật" >> "Voice over" >> "Hoạt hình"'].map((p,i)=>`
+      <div class="dark-box" style="font-size:10px;color:#cbd5e1;line-height:1.3"><span style="color:#f59e0b;font-weight:700">${i+1}.</span> ${p}</div>`).join('')}
+    </div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:8px">
+    ${TM.map((t,i)=>{
+      const isExp=expandedTM===i;
+      const relVids=V.filter(v=>v.tp===t.id);
+      return`<div class="card-sm bordered-left" style="border-color:#f59e0b" onclick="toggleTM(${i})">
+        <div class="flex justify-between items-center">
+          <div>
+            <div class="flex items-center gap-2" style="margin-bottom:2px">
+              <span style="font-size:12px;font-weight:800;color:#f59e0b">${t.id}</span>
+              <span style="font-size:13px;font-weight:700;color:#e2e8f0">${t.n}</span>
+            </div>
+            <div class="flex items-center gap-2">${pbadges(t.p)}${cbadges(t.ch)}<span style="font-size:9px;color:#64748b;margin-left:3px">${t.eg} | ${relVids.length} video</span></div>
+          </div>
+          <span class="chevron ${isExp?'rotated':''}">▼</span>
+        </div>
+        ${isExp?`<div class="expand-detail" onclick="event.stopPropagation()">
+          <div class="grid-2" style="margin-bottom:14px">
+            <div>
+              <div class="lbl">Cấu trúc</div>
+              ${t.st.map((s,j)=>`<div class="flex gap-2 items-center" style="margin-bottom:3px">
+                <span style="background:#f59e0b;color:#000;border-radius:50%;width:16px;height:16px;display:inline-flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0">${j+1}</span>
+                <span style="font-size:11px;color:#cbd5e1">${s}</span>
+              </div>`).join('')}
+            </div>
+            <div>
+              ${t.hk.length?`<div style="margin-bottom:8px"><div class="lbl">Hook mẫu</div>
+                ${t.hk.map(h=>`<div style="background:#0f172a;border-radius:5px;padding:6px;font-size:11px;color:#fbbf24;margin-bottom:3px;line-height:1.3;font-style:italic;border-left:2px solid #f59e0b">${h}</div>`).join('')}
+              </div>`:''}
+              ${t.mt.length?`<div style="margin-bottom:8px"><div class="lbl">Ví von tái sử dụng</div>
+                ${t.mt.map(m=>`<div style="font-size:10px;color:#94a3b8;margin-bottom:1px">- ${m}</div>`).join('')}
+              </div>`:''}
+              ${t.nt?`<div><div class="lbl">Lưu ý</div><div style="font-size:10px;color:#f87171;line-height:1.3">${t.nt}</div></div>`:''}
+            </div>
+          </div>
+          <div>
+            <div class="lbl" style="margin-bottom:6px">Video mẫu + Video tương tự (${relVids.length} video)</div>
+            ${t.rv?notionLink(t.rv.nid,'🎯 VIDEO MẪU: '+t.rv.t+' ('+t.rv.eg+')'):''}
+            ${t.pa?`<div style="margin-top:10px;background:#0f172a;border-radius:8px;padding:12px">
+              <div style="font-size:9px;color:#f59e0b;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Phân tích 5 nguyên tắc trong video mẫu trên</div>
+              ${t.pa.map(pa=>`<div style="display:flex;gap:8px;margin-bottom:7px;align-items:flex-start">
+                <span style="font-size:14px;flex-shrink:0">${pa.a?'✅':'❌'}</span>
+                <div><span style="font-size:11px;font-weight:700;color:${pa.a?'#10b981':'#64748b'}">${pa.p}:</span> <span style="font-size:11px;color:#cbd5e1">${pa.d}</span></div>
+              </div>`).join('')}
+            </div>`:''}
+            <div style="margin-top:8px">${relVids.filter(v=>v.nid!==t.rv?.nid).map(v=>notionLink(v.nid,v.t)).join('')}</div>
+          </div>
+        </div>`:''}
+      </div>`;
+    }).join('')}
+  </div>`;
+}
+
+// ============ TAB 4: COMMENT TOPICS ============
+function renderTab4(){
+  return`
+  <h2 style="font-size:18px;font-weight:700;color:#e2e8f0;margin:0 0 4px">Chủ đề gợi ý từ comment</h2>
+  <p style="color:#94a3b8;font-size:11px;margin:0 0 12px">Câu hỏi khán giả chưa được trả lời. Phan nhom theo nhu cau.</p>
+  <div class="info-box" style="margin-bottom:12px">
+    <div style="font-weight:700;margin-bottom:4px">Cách tính Priority (tong 3 tieu chi, thang 3-9):</div>
+    <div class="grid-3" style="font-size:10px;color:#cbd5e1">
+      <div class="dark-box"><div style="color:#f59e0b;font-weight:700;margin-bottom:2px">Tần suất</div>1 video=1d | 2-3=2d | 4+=3d</div>
+      <div class="dark-box"><div style="color:#f59e0b;font-weight:700;margin-bottom:2px">Gần sản phẩm</div>Không=0d | Gián tiếp=1-2d | Trực tiếp=3d</div>
+      <div class="dark-box"><div style="color:#f59e0b;font-weight:700;margin-bottom:2px">Co video Douyin?</div>Không=1d | Co the=2d | Da co KW=3d</div>
+    </div>
+  </div>
+  ${TG.map(g=>`
+  <div style="margin-bottom:16px">
+    <div class="flex items-center gap-2" style="margin-bottom:8px">
+      <h3 style="font-size:14px;font-weight:700;color:#e2e8f0;margin:0">${g.g}</h3>
+      <span style="font-size:11px;color:#94a3b8">${g.d}</span>
+    </div>
+    ${[...g.ts].sort((a,b)=>(b.f+b.pr+b.sc)-(a.f+a.pr+a.sc)).map(t=>{
+      const score=t.f+t.pr+t.sc;const sc=score>=7?'#f59e0b':score>=5?'#3b82f6':'#94a3b8';const lb=score>=7?'Rất cao':score>=5?'Cao':'TB';
+      return`<div class="card-sm bordered-left" style="border-color:${sc};margin-bottom:6px">
+        <div class="flex justify-between items-center">
+          <div style="flex:1">
+            <div style="font-size:13px;font-weight:700;color:#e2e8f0;margin-bottom:3px">${t.t}</div>
+            <div style="font-size:10px;color:#94a3b8">Nguồn: ${t.src}</div>
+          </div>
+          <div style="text-align:right;flex-shrink:0;margin-left:8px">
+            <div class="flex items-center gap-2" style="justify-content:flex-end">
+              <span style="font-size:16px;font-weight:800;color:${sc}">${score}</span>
+              ${badge(lb,sc+'22',sc,sc+'44')}
+            </div>
+            <div style="margin-top:4px">${pbadges(t.p)}</div>
+          </div>
+        </div>
+      </div>`;
+    }).join('')}
+  </div>`).join('')}`;
+}
+
+// ============ MAIN CONTROLLER ============
+let curTab=0;
+const tabNames=['Tổng quan','Ngân hàng Video','Playbook','Chủ đề'];
+const renderers=[renderTab1,renderTab2,renderTab3,renderTab4];
+
+function render(){
+  // Tab bar
+  document.getElementById('tabBar').innerHTML=tabNames.map((n,i)=>
+    `<button class="tab-btn ${curTab===i?'active':''}" onclick="setTab(${i})">${n}</button>`
+  ).join('');
+  // Content
+  document.getElementById('content').innerHTML=renderers[curTab]();
+}
+
+function setTab(i){curTab=i;expandedIdx=null;expandedTM=null;render();}
+function setFilter(f){curFilter=f;expandedIdx=null;render();}
+function toggleExpand(i){expandedIdx=expandedIdx===i?null:i;render();}
+function toggleTM(i){expandedTM=expandedTM===i?null:i;render();}
+
+// Persona bar
+document.getElementById('personaBar').innerHTML=Object.entries(PN).map(([k,v])=>
+  `<div class="persona-dot" style="color:${PC[k]}"><div class="dot" style="background:${PC[k]}"></div>${k}: ${v}</div>`
+).join('');
+
+render();
+</script>
+</body>
+</html>
